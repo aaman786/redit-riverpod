@@ -14,13 +14,34 @@ class AddModScreen extends ConsumerStatefulWidget {
 }
 
 class _AddModScreenState extends ConsumerState<AddModScreen> {
+  Set<String> uids = {};
+  int ctr = 0;
+
+  void addUids(String uid) {
+    setState(() {
+      uids.add(uid);
+    });
+  }
+
+  void removeUids(String uid) {
+    setState(() {
+      uids.remove(uid);
+    });
+  }
+
+  void saveMods() {
+    ref
+        .read((communityControllerProvider.notifier))
+        .addMods(widget.name, uids.toList(), context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: saveMods,
             icon: const Icon(Icons.done),
           ),
         ],
@@ -32,11 +53,23 @@ class _AddModScreenState extends ConsumerState<AddModScreen> {
                 final member = community.members[index];
 
                 return ref.watch(getUserDataProvider(member)).when(
-                    data: (user) => CheckboxListTile(
-                          value: true,
-                          onChanged: (val) {},
-                          title: Text(user.name),
-                        ),
+                    data: (user) {
+                      if (community.mods.contains(member) && ctr == 0) {
+                        uids.add(member);
+                      }
+                      ctr++;
+                      return CheckboxListTile(
+                        value: uids.contains(user.uid),
+                        onChanged: (val) {
+                          if (val!) {
+                            addUids(user.uid);
+                          } else {
+                            removeUids(user.uid);
+                          }
+                        },
+                        title: Text(user.name),
+                      );
+                    },
                     error: (error, stackTrace) =>
                         ErrorText(error: error.toString()),
                     loading: () => const Loader());
