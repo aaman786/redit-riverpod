@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 
 import '../../../theme/pallete.dart';
 import '../../auth/controller/auth_controller.dart';
@@ -10,6 +10,10 @@ class ProfileDrawer extends ConsumerWidget {
 
   void logOut(WidgetRef ref) {
     ref.read(authControllerProvider.notifier).logOut();
+  }
+
+  void navigateToUserProfile(BuildContext context, String uid) {
+    Routemaster.of(context).push('/u/$uid');
   }
 
   @override
@@ -36,8 +40,7 @@ class ProfileDrawer extends ConsumerWidget {
             ListTile(
               title: const Text('My Profile'),
               leading: const Icon(Icons.person),
-              // onTap: () => navigateToUserProfile(context, user.uid),
-              onTap: () {},
+              onTap: () => navigateToUserProfile(context, user.uid),
             ),
             ListTile(
               title: const Text('Log Out'),
