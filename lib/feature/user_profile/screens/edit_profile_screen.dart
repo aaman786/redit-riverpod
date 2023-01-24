@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/feature/auth/controller/auth_controller.dart';
@@ -69,10 +68,13 @@ class _EditProfileScrenState extends ConsumerState<EditProfileScren> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(userProfileControllerProvider);
+    final currentTheme = ref.watch(themeNoifierProvider);
+
     return ref.watch(getUserDataProvider(widget.uid)).when(
         data: (user) {
           return Scaffold(
-            backgroundColor: Pallete.darkModeAppTheme.backgroundColor,
+            backgroundColor: currentTheme.backgroundColor,
+            // backgroundColor: Pallete.darkModeAppTheme.backgroundColor,
             appBar: AppBar(
               title: const Text('Edit Profile'),
               centerTitle: false,
@@ -94,8 +96,8 @@ class _EditProfileScrenState extends ConsumerState<EditProfileScren> {
                                 radius: const Radius.circular(10),
                                 dashPattern: const [10, 4],
                                 strokeCap: StrokeCap.round,
-                                // color: currentTheme.textTheme.bodyText2!.color!,
-                                color: Colors.white,
+                                color: currentTheme.textTheme.bodyText2!.color!,
+                                // color: Colors.white,
                                 child: Container(
                                   width: double.infinity,
                                   height: 150,
