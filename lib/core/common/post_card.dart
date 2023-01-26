@@ -28,6 +28,12 @@ class PostCard extends ConsumerWidget {
     ref.read(postControllerProvider.notifier).downvote(post);
   }
 
+  void awardPost(WidgetRef ref, String award, BuildContext context) {
+    ref
+        .read(postControllerProvider.notifier)
+        .awardPost(post: post, award: award, context: context);
+  }
+
   void navigateToUserProfile(BuildContext context) {
     Routemaster.of(context).push('/u/${post.uid}');
   }
@@ -293,41 +299,37 @@ class PostCard extends ConsumerWidget {
                                     //     ? () {}
                                     //     :
                                     () {
-                                  // showDialog(
-                                  //   context: context,
-                                  //   builder: (context) => Dialog(
-                                  //     child: Padding(
-                                  //       padding: const EdgeInsets.all(20),
-                                  //       child: GridView.builder(
-                                  //         shrinkWrap: true,
-                                  //         gridDelegate:
-                                  //             const SliverGridDelegateWithFixedCrossAxisCount(
-                                  //           crossAxisCount: 4,
-                                  //         ),
-                                  //         itemCount: user.awards.length,
-                                  //         itemBuilder:
-                                  //             (BuildContext context,
-                                  //                 int index) {
-                                  //           final award =
-                                  //               user.awards[index];
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(20),
+                                        child: GridView.builder(
+                                          shrinkWrap: true,
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 4,
+                                          ),
+                                          itemCount: user.awards.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            final award = user.awards[index];
 
-                                  //           return GestureDetector(
-                                  //             onTap: () => awardPost(
-                                  //                 ref, award, context),
-                                  //             child: Padding(
-                                  //               padding:
-                                  //                   const EdgeInsets.all(
-                                  //                       8.0),
-                                  //               child: Image.asset(
-                                  //                   Constants
-                                  //                       .awards[award]!),
-                                  //             ),
-                                  //           );
-                                  //         },
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // );
+                                            return GestureDetector(
+                                              onTap: () => awardPost(
+                                                  ref, award, context),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Image.asset(
+                                                    Constant.awards[award]!),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  );
                                 },
                                 icon: const Icon(Icons.card_giftcard_outlined),
                               ),
