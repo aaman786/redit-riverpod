@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/common/error_text.dart';
 import 'package:reddit/feature/post/controller/post_controller.dart';
+import 'package:routemaster/routemaster.dart';
 
 import '../../feature/auth/controller/auth_controller.dart';
 import '../../feature/community/controller/community_controller.dart';
@@ -19,13 +20,33 @@ class PostCard extends ConsumerWidget {
     ref.read(postControllerProvider.notifier).deletePost(post, context);
   }
 
+  void upvotePost(WidgetRef ref) {
+    ref.read(postControllerProvider.notifier).upvote(post);
+  }
+
+  void downvotePost(WidgetRef ref) {
+    ref.read(postControllerProvider.notifier).downvote(post);
+  }
+
+  void navigateToUserProfile(BuildContext context) {
+    Routemaster.of(context).push('/u/${post.uid}');
+  }
+
+  void navigateToCommunity(BuildContext context) {
+    Routemaster.of(context).push('/r/${post.communityName}');
+  }
+
+  void navigateToCommentScreen(BuildContext context) {
+    Routemaster.of(context).push('/post/${post.id}/comments');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isTypeImage = post.type == 'image';
     final isTypeText = post.type == 'text';
     final isTypeLink = post.type == 'link';
     final user = ref.watch(userProvider)!;
-    final isGuest = !user.isAuthenticated;
+    // final isGuest = !user.isAuthenticated;
 
     final currentTheme = ref.watch(themeNoifierProvider);
 
@@ -88,8 +109,7 @@ class PostCard extends ConsumerWidget {
                               Row(
                                 children: [
                                   GestureDetector(
-                                    onTap: () {},
-                                    //  => navigateToCommunity(context),
+                                    onTap: () => navigateToCommunity(context),
                                     child: CircleAvatar(
                                       backgroundImage: NetworkImage(
                                         post.communityProfilePic,
@@ -111,8 +131,8 @@ class PostCard extends ConsumerWidget {
                                           ),
                                         ),
                                         GestureDetector(
-                                          onTap: () {},
-                                          // => navigateToUser(context),
+                                          onTap: () =>
+                                              navigateToUserProfile(context),
                                           child: Text(
                                             'u/${post.username}',
                                             style:
@@ -199,7 +219,7 @@ class PostCard extends ConsumerWidget {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () => upvotePost(ref),
                                     // isGuest
                                     //     ? () {}
                                     //     : () => upvotePost(ref),
@@ -216,7 +236,7 @@ class PostCard extends ConsumerWidget {
                                     style: const TextStyle(fontSize: 17),
                                   ),
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () => downvotePost(ref),
                                     //  isGuest
                                     //     ? () {}
                                     //     :
@@ -234,9 +254,8 @@ class PostCard extends ConsumerWidget {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
-                                    //  =>
-                                    //     navigateToComments(context),
+                                    onPressed: () =>
+                                        navigateToCommentScreen(context),
                                     icon: const Icon(
                                       Icons.comment,
                                     ),
@@ -254,9 +273,8 @@ class PostCard extends ConsumerWidget {
                                     data: (data) {
                                       if (data.mods.contains(user.uid)) {
                                         return IconButton(
-                                          onPressed: () {},
-                                          //  =>
-                                          //     deletePost(ref, context),
+                                          onPressed: () =>
+                                              deletePost(ref, context),
                                           icon: const Icon(
                                             Icons.admin_panel_settings,
                                           ),

@@ -6,6 +6,7 @@ import 'package:reddit/feature/community/controller/community_controller.dart';
 import 'package:reddit/models/community_model.dart';
 import 'package:routemaster/routemaster.dart';
 
+import '../../../core/common/post_card.dart';
 import '../../auth/controller/auth_controller.dart';
 
 class CommunityScreen extends ConsumerWidget {
@@ -27,8 +28,8 @@ class CommunityScreen extends ConsumerWidget {
     final user = ref.watch(userProvider)!;
 
     return Scaffold(
-        body: ref.watch(getCommunityByNameProvider(name)).when(
-            data: (community) => NestedScrollView(
+      body: ref.watch(getCommunityByNameProvider(name)).when(
+          data: (community) => NestedScrollView(
                 headerSliverBuilder: (context, innerBoxIsScrolled) {
                   return [
                     SliverAppBar(
@@ -115,8 +116,21 @@ class CommunityScreen extends ConsumerWidget {
                     ),
                   ];
                 },
-                body: const Text("Displaying posts")),
-            error: (error, stackTrace) => ErrorText(error: error.toString()),
-            loading: () => const Loader()));
+                body: ref.watch(getCommunityPostsProvider(name)).when(
+                    data: (data) => ListView.builder(
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          final post = data[index];
+                          return PostCard(post: post);
+                        }),
+                    error: (error, stackTrace) {
+                      print(error.toString());
+                      return ErrorText(error: error.toString());
+                    },
+                    loading: () => const Loader()),
+              ),
+          error: (error, stackTrace) => ErrorText(error: error.toString()),
+          loading: () => const Loader()),
+    );
   }
 }

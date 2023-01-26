@@ -10,6 +10,7 @@ import 'package:routemaster/routemaster.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/provider/strorage_repository_provider.dart';
+import '../../../models/comment_model.dart';
 import '../../../models/post_model.dart';
 
 final postControllerProvider =
@@ -28,6 +29,16 @@ final userPostsProvider =
     StreamProvider.family((ref, List<Community> communities) {
   final postController = ref.watch(postControllerProvider.notifier);
   return postController.fetchUserPosts(communities);
+});
+
+final getPostByIdProvider = StreamProvider.family((ref, String postId) {
+  final postController = ref.watch(postControllerProvider.notifier);
+  return postController.getPostById(postId);
+});
+
+final getPostCommentsProvider = StreamProvider.family((ref, String postId) {
+  final postController = ref.watch(postControllerProvider.notifier);
+  return postController.fetchPostComment(postId);
 });
 
 class PostController extends StateNotifier<bool> {
@@ -167,5 +178,43 @@ class PostController extends StateNotifier<bool> {
             (r) => showSnackBar(context, "Post is deleted succesfully!"));
       });
     }
+  }
+
+  void upvote(Post post) {
+    final uid = _ref.read(userProvider)!.uid;
+    _postRepository.upvote(post, uid);
+  }
+
+  void downvote(Post post) {
+    final uid = _ref.read(userProvider)!.uid;
+    _postRepository.downvote(post, uid);
+  }
+
+  Stream<Post> getPostById(String postId) {
+    return _postRepository.getPostById(postId);
+  }
+
+  void addComment(
+      {required BuildContext context,
+      required String text,
+      required String postId}) async {
+    final user = _ref.read(userProvider)!;
+
+    String commentId = const Uuid().v1();
+    Comment comment = Comment(
+        id: commentId,
+        text: text,
+        createdAt: DateTime.now(),
+        postId: postId,
+        username: user.name,
+        profilePic: user.profilePic);
+
+    final res = await _postRepository.addComment(comment);
+
+    res.fold((l) => showSnackBar(context, l.message), (r) => null);
+  }
+
+  Stream<List<Comment>> fetchPostComment(String postId) {
+    return _postRepository.getCommentsOfPost(postId);
   }
 }
