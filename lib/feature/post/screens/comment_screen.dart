@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/common/error_text.dart';
 import '../../../core/common/loader.dart';
 import '../../../core/common/post_card.dart';
+import '../../auth/controller/auth_controller.dart';
 import '../controller/post_controller.dart';
 import '../widgets/comment_card.dart';
 
@@ -36,6 +37,9 @@ class _CommentsSScreenState extends ConsumerState<CommentsSScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider)!;
+    final isGuest = !user.isAuthenticated;
+
     return Scaffold(
       appBar: AppBar(),
       body: ref.watch(getPostByIdProvider(widget.postId)).when(
@@ -43,18 +47,16 @@ class _CommentsSScreenState extends ConsumerState<CommentsSScreen> {
               return Column(
                 children: [
                   PostCard(post: post),
-                  // if (!isGuest)
-                  TextField(
-                    onSubmitted: (val) => addComment(post.id),
-                    // => addComment(data),
-                    controller: commentCtrl,
-                    decoration: const InputDecoration(
-                      hintText: 'What are your thoughts?',
-                      filled: true,
-                      border: InputBorder.none,
+                  if (!isGuest)
+                    TextField(
+                      onSubmitted: (val) => addComment(post.id),
+                      controller: commentCtrl,
+                      decoration: const InputDecoration(
+                        hintText: 'What are your thoughts?',
+                        filled: true,
+                        border: InputBorder.none,
+                      ),
                     ),
-                  ),
-
                   ref.watch(getPostCommentsProvider(widget.postId)).when(
                         data: (data) {
                           return Expanded(

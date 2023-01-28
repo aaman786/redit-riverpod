@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/constants/constant.dart';
@@ -7,6 +8,7 @@ import 'package:reddit/feature/home/delegates/search_community_delegates.dart';
 import 'package:reddit/feature/home/drawers/community_list_drawer.dart';
 import 'package:reddit/feature/home/drawers/profile_drawer.dart';
 import 'package:reddit/theme/pallete.dart';
+import 'package:routemaster/routemaster.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -32,9 +34,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  // FOR THE WEB VERSION
+  void navigateToAddPost() {
+    Routemaster.of(context).push('/add-post');
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider)!;
+    final isGuest = !user.isAuthenticated;
     final currentTheme = ref.watch(themeNoifierProvider);
     return Scaffold(
       appBar: AppBar(
@@ -54,6 +62,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
               icon: const Icon(Icons.search),
             ),
+            IconButton(
+              onPressed: navigateToAddPost,
+              icon: const Icon(Icons.add),
+            ),
             Builder(builder: (context) {
               return IconButton(
                 onPressed: () => displayEndDrawer(context),
@@ -65,17 +77,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ]),
       body: Constant.tabWidgets[_page],
       drawer: const CommuityListDrawer(),
-      endDrawer: const ProfileDrawer(),
-      bottomNavigationBar: CupertinoTabBar(
-        activeColor: currentTheme.iconTheme.color,
-        backgroundColor: currentTheme.backgroundColor,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
-        ],
-        onTap: pageChange,
-        currentIndex: _page,
-      ),
+      endDrawer: isGuest ? null : const ProfileDrawer(),
+      bottomNavigationBar: isGuest || kIsWeb
+          ? null
+          : CupertinoTabBar(
+              activeColor: currentTheme.iconTheme.color,
+              backgroundColor: currentTheme.backgroundColor,
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.add), label: 'Add post'),
+              ],
+              onTap: pageChange,
+              currentIndex: _page,
+            ),
     );
   }
 }

@@ -3,12 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/constants/constant.dart';
 import 'package:reddit/core/utils.dart';
 import 'package:reddit/feature/auth/controller/auth_controller.dart';
+import 'package:reddit/responsive/responsive.dart';
 
 import '../../../core/common/loader.dart';
 import '../../../core/common/sign_button.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
+
+  void signInAsGuest(WidgetRef ref, BuildContext context) {
+    ref.read(authControllerProvider.notifier).signInAsGuest(context);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,7 +27,7 @@ class LoginScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () => signInAsGuest(ref, context),
             child: const Text(
               'Skip',
               style: TextStyle(
@@ -54,7 +59,7 @@ class LoginScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const SignInButton(),
+                const Responsive(child: SignInButton()),
               ],
             ),
     );

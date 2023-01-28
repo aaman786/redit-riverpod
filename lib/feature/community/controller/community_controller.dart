@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:reddit/core/constants/constant.dart';
@@ -111,18 +112,25 @@ class CommunityController extends StateNotifier<bool> {
       {required Community community,
       required File? profileFile,
       required File? bannerFile,
-      required BuildContext context}) async {
+      required BuildContext context,
+      required Uint8List? webFile}) async {
     state = true;
     if (profileFile != null) {
       final res = await _storageRepository.storeFile(
-          path: 'communities/profile', id: community.name, file: profileFile);
+          path: 'communities/profile',
+          id: community.name,
+          file: profileFile,
+          webFile: webFile);
       res.fold((l) => showSnackBar(context, l.message),
           (r) => community = community.copyWith(avatar: r));
     }
 
     if (bannerFile != null) {
       final res = await _storageRepository.storeFile(
-          path: 'communities/banner', id: community.name, file: bannerFile);
+          path: 'communities/banner',
+          id: community.name,
+          file: bannerFile,
+          webFile: webFile);
       res.fold((l) => showSnackBar(context, l.message),
           (r) => community = community.copyWith(avatar: r));
     }
